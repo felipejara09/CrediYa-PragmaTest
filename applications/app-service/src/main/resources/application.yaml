@@ -11,13 +11,22 @@ spring:
       path: "/h2"
   profiles:
     include: null
+  app:
+    postgresql:
+      host: localhost
+      port: 5432
+      database: crediya
+      username: postgres
+      password: postgrespws
   r2dbc:
-    url: r2dbc:mysql://localhost:3306/crediya
-    username: root
-    password: root
-    sql:
-      init:
-        mode: "always"
+    url: r2dbc:postgresql://localhost:5432/crediya
+    username: postgres
+    password: postgrespws
+    flyway:
+      url: jdbc:postgresql://localhost:5432/crediya
+      user: postgres
+      password: postgrespws
+      locations: classpath:db/migration
   logging:
     level:
       org.springframework: "INFO"

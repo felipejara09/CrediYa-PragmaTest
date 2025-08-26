@@ -7,6 +7,23 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 public class UserUseCase {
+
+    private final UserRepository userRepository;
+
+    public Mono<User> save(User user){
+        return userRepository.save(user);
+    }
+
+    public Mono<User>  findByEmail(String email){
+        return userRepository.findByEmail(email);
+    }
+
+}
+
+/*
+
+@RequiredArgsConstructor
+public class UserUseCase {
     private final UserRepository repository;
 
     public Mono<Object> register(User user){
@@ -25,4 +42,4 @@ public class UserUseCase {
                 .flatMap(existing -> Mono.error(new IllegalArgumentException("Correo ya registrado")))
                 .switchIfEmpty(repository.save(user));
     }
-}
+}*/

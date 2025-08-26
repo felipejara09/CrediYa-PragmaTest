@@ -1,23 +1,27 @@
 package co.com.bancolombia.model.user;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
+//import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Data
-@Builder
-@AllArgsConstructor
+
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
 public class User {
-    private Long id;
-    private String nombres;
-    private String apellidos;
-    private String correoElectronico;
-    private LocalDate fechaNacimiento;
-    private String direccion;
-    private String telefono;
-    private Double salarioBase;
+
+        private Long id;
+        private String name;
+        private String lastName;
+        private String email;
+        private String identityNumber;
+        private LocalDate dateBorn;
+        private String address;
+        private String phoneNumber;
+        private String idRol;
+        private BigDecimal baseSalary;
+
+
 }
