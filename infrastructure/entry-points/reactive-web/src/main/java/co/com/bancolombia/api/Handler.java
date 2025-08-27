@@ -1,57 +1,69 @@
 package co.com.bancolombia.api;
 
 import co.com.bancolombia.api.dto.CreateUserDTO;
-import co.com.bancolombia.api.dto.UserDTO;
+import jakarta.validation.ConstraintViolation;
 import co.com.bancolombia.api.mapper.UserDTOMapper;
 import co.com.bancolombia.usecase.user.UserUseCase;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import javax.xml.validation.Validator;
+import java.net.URI;
+import java.util.List;
 
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class Handler {
 
     private final UserUseCase userUseCase;
     private final UserDTOMapper mapper;
+    private final Validator validator;
 
-
+    @Transactional
     public Mono<ServerResponse> register(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(CreateUserDTO.class)
-               // .flatMap(this::validate)
+                .flatMap(this::validate)
                 .map(mapper::toDomain)
                 .flatMap(userUseCase::save)
                 .map(mapper::toResponse)
-                .flatMap(response ->
-                        ServerResponse.ok()
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue(response)
-                );
+                .flatMap(response -> {
+                    log.info("User created with id={}", response.id());
+                    return ServerResponse
+                            .created(URI.create("/api/v1/usuarios/" + response.id()))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(response);
+                });
     }
 
-    public Mono<ServerResponse> listenGETOtherUseCase(ServerRequest serverRequest) {
-        // useCase2.logic();
-        return ServerResponse.ok().bodyValue("");
-    }
-
-    public Mono<ServerResponse> listenPOSTUseCase(ServerRequest serverRequest) {
-        // useCase.logic();
-        return ServerResponse.ok().bodyValue("");
-    }
-
-    private Mono<UserDTO> validate(UserDTO dto) {
-        if (dto.name() == null || dto.name().isBlank()) {
-            return Mono.error(new IllegalArgumentException("El nombre es obligatorio"));
-        }
-        if (dto.email() == null || !dto.email().contains("@")) {
-            return Mono.error(new IllegalArgumentException("Email inválido"));
+    private Mono<CreateUserDTO> validate(CreateUserDTO dto) {
+        var violations = validator.validate(dto);
+        if (!violations.isEmpty()) {
+            List<String> details = violations.stream()
+                    .map(this::fmt)
+                    .toList();
+            return Mono.error(new BadRequestException("Invalid input", details));
         }
         return Mono.just(dto);
+    }
+
+    private String fmt(ConstraintViolation<?> v) {
+        return v.getPropertyPath() + ": " + v.getMessage();
+    }
+
+  
+    public static final class BadRequestException extends RuntimeException {
+        public final List<String> details;
+        public BadRequestException(String message, List<String> details) {
+            super(message);
+            this.details = details;
+        }
     }
 }

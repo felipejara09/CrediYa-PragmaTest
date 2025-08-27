@@ -17,6 +17,7 @@ import java.time.LocalDate;
 public class UserEntity {
 
     @Id
+    @Column("id_user")
     private Long id;
     private String name;
     private String lastName;

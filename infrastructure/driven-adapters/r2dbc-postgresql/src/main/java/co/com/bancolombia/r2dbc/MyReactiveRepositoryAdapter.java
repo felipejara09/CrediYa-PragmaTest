@@ -17,14 +17,13 @@ public class MyReactiveRepositoryAdapter
 
 
     public MyReactiveRepositoryAdapter(UserReactiveRepository repository, ObjectMapper mapper) {
-        // 👇 aquí indicamos cómo convertir entity → domain
+
         super(repository, mapper, d -> mapper.map(d, User.class));
         this.repository = repository;
     }
 
     @Override
     public Mono<User> findByEmail(String email) {
-        // usamos la conversión que ya trae ReactiveAdapterOperations
         return repository.findByEmail(email)
                 .map(this::toEntity);
     }
