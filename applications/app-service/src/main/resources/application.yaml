@@ -2,7 +2,7 @@ server:
   port: 8080
 spring:
   application:
-    name: "CrediYa-Pragma"
+    name: "Authentication"
   devtools:
     add-properties: false
   h2:
@@ -15,15 +15,15 @@ spring:
     postgresql:
       host: localhost
       port: 5432
-      database: crediya
+      database: authentication
       username: postgres
       password: postgrespws
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/crediya
+    url: r2dbc:postgresql://localhost:5432/authentication
     username: postgres
     password: postgrespws
     flyway:
-      url: jdbc:postgresql://localhost:5432/crediya
+      url: jdbc:postgresql://localhost:5432/authentication
       user: postgres
       password: postgrespws
       locations: classpath:db/migration

@@ -58,7 +58,7 @@ public class Handler {
         return v.getPropertyPath() + ": " + v.getMessage();
     }
 
-  
+
     public static final class BadRequestException extends RuntimeException {
         public final List<String> details;
         public BadRequestException(String message, List<String> details) {

@@ -20,7 +20,7 @@ public class User {
         private LocalDate dateBorn;
         private String address;
         private String phoneNumber;
-        private String idRol;
+        private Long idRol;
         private BigDecimal baseSalary;
 
 

@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@Table("usuario")
+@Table("users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -26,6 +26,6 @@ public class UserEntity {
     private LocalDate dateBorn;
     private String address;
     private String phoneNumber;
-    private String idRol;
+    private Long idRol;
     private BigDecimal baseSalary;
 }
