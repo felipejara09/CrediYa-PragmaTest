@@ -2,13 +2,13 @@ package co.com.bancolombia.usecase.user;
 
 import co.com.bancolombia.model.user.User;
 import co.com.bancolombia.model.user.gateways.UserRepository;
+import co.com.bancolombia.usecase.user.exception.DuplicateEmailException;
+import co.com.bancolombia.usecase.user.exception.InvalidBaseSalaryRangeException;
+import co.com.bancolombia.usecase.user.exception.InvalidEmailFormatException;
+import co.com.bancolombia.usecase.user.exception.RequiredFieldMissingException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mockito;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -18,38 +18,94 @@ import java.time.LocalDate;
 import static org.mockito.Mockito.*;
 
 
-@ExtendWith(MockitoExtension.class)
+
 public class UserUseCaseTest {
-    @Mock
-    UserRepository userRepository;
+    private UserRepository repo;
+    private UserUseCase useCase;
 
-    @InjectMocks
-    UserUseCase useCase; // ← Mockito crea el use case inyectando el mock via constructor
-
-    @Test
-    @DisplayName("save delega al repositorio y retorna el usuario guardado")
-    void save_success() {
-        User input = sample(null);
-        User saved = input.toBuilder().id(1L).build();
-
-        when(userRepository.save(input)).thenReturn(Mono.just(saved));
-
-        StepVerifier.create(useCase.save(input))
-                .expectNext(saved)
-                .verifyComplete();
-
-        verify(userRepository).save(input);
-        verifyNoMoreInteractions(userRepository);
+    @BeforeEach
+    void setUp() {
+        repo = Mockito.mock(UserRepository.class);
+        useCase = new UserUseCase(repo);
     }
 
-
-    private User sample(Long id) {
+    private User validUser() {
         return User.builder()
-                .id(id).name("Alice").lastName("Doe").email("alice@example.com")
-                .identityNumber("123").dateBorn(LocalDate.of(1990,1,1))
-                .address("Main 1").phoneNumber("3001234567").idRol("USER")
-                .baseSalary(new BigDecimal("1000.00"))
+                .id(1L)
+                .name("Juan")
+                .lastName("Pérez")
+                .email("juan.perez@test.com")
+                .identityNumber("123")
+                .dateBorn(LocalDate.of(1990,1,1))
+                .address("CL 1 # 2-3")
+                .phoneNumber("3000000000")
+                .idRol(1L)
+                .baseSalary(new BigDecimal("1000000"))
                 .build();
+    }
+
+    @Test
+    void save_ok_whenValidAndUniqueEmail() {
+        User u = validUser();
+        when(repo.findByEmail(eq(u.getEmail()))).thenReturn(Mono.empty());
+        when(repo.save(any(User.class))).thenReturn(Mono.just(u));
+
+        StepVerifier.create(useCase.save(u))
+                .expectNext(u)
+                .verifyComplete();
+
+        verify(repo).findByEmail(u.getEmail());
+        verify(repo).save(u);
+    }
+
+    @Test
+    void save_fails_whenDuplicateEmail() {
+        User u = validUser();
+
+        when(repo.findByEmail(eq(u.getEmail()))).thenReturn(Mono.just(u));
+
+        StepVerifier.create(useCase.save(u))
+                .expectError(DuplicateEmailException.class)
+                .verify();
+
+        verify(repo).findByEmail(u.getEmail());
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    void save_fails_whenEmailFormatInvalid() {
+        User u = validUser().toBuilder().email("mal-formato").build();
+
+        StepVerifier.create(useCase.save(u))
+                .expectError(InvalidEmailFormatException.class)
+                .verify();
+
+        verify(repo, never()).findByEmail(any());
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    void save_fails_whenBaseSalaryOutOfRange() {
+        User u = validUser().toBuilder().baseSalary(new BigDecimal("20000000")).build();
+
+        StepVerifier.create(useCase.save(u))
+                .expectError(InvalidBaseSalaryRangeException.class)
+                .verify();
+
+        verify(repo, never()).findByEmail(any());
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    void save_fails_whenRequiredBlank() {
+        User u = validUser().toBuilder().name("  ").build();
+
+        StepVerifier.create(useCase.save(u))
+                .expectError(RequiredFieldMissingException.class)
+                .verify();
+
+        verify(repo, never()).findByEmail(any());
+        verify(repo, never()).save(any());
     }
 
 }

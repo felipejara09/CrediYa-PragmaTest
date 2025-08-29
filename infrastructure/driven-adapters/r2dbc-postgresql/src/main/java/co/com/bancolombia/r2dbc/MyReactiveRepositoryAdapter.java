@@ -23,9 +23,14 @@ public class MyReactiveRepositoryAdapter
     }
 
     @Override
+    public Mono<User> save(User user) {
+        return super.save(user); // ya viene en ReactiveAdapterOperations
+    }
+
+    @Override
     public Mono<User> findByEmail(String email) {
         return repository.findByEmail(email)
-                .map(this::toEntity);
+                .map(this::toEntity); // <- D (UserEntity) -> E (User)
     }
 
 }
