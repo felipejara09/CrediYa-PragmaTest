@@ -48,7 +48,9 @@ public class UserUseCase {
 
     private void required(String value, String field) {if (value == null || value.trim().isEmpty()) throw new RequiredFieldMissingException(field);}
 
-
+    public Mono<User> findByIdentityAndEmail(String identityNumber, String email) {
+        return userRepository.findByIdentityAndEmail(identityNumber, email);
+    }
 
 
 }
