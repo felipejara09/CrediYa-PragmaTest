@@ -33,7 +33,7 @@ public class RouterRest {
     })
     public RouterFunction<ServerResponse> routerFunction(Handler handler) {
         return route(POST("/api/v1/usuarios"), handler::register)
-                .andRoute(GET("/api/v1/usuarios/verify-email"), handler::verifyByEmail)
-                .andRoute(GET("/ping"), req -> ServerResponse.ok().bodyValue("pong"));
+                .andRoute(GET("/api/v1/usuarios/verify"), handler::verify);
+
     }
 }

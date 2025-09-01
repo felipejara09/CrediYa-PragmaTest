@@ -51,8 +51,8 @@ public class Handler {
         }
 
         return userUseCase.findByIdentityAndEmail(identityNumber, email)
-                .flatMap(u -> ServerResponse.ok().build())           // 200 si existe
-                .switchIfEmpty(ServerResponse.notFound().build());   // 404 si no
+                .flatMap(u -> ServerResponse.ok().build())
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 
 
@@ -78,8 +78,8 @@ public class Handler {
                     .bodyValue(java.util.Map.of("code","BAD_REQUEST","message","email is required"));
         }
         return userUseCase.findByEmail(email)
-                .flatMap(u -> ServerResponse.ok().build())          // 200 si existe
-                .switchIfEmpty(ServerResponse.notFound().build());  // 404 si no
+                .flatMap(u -> ServerResponse.ok().build())
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
     public record VerifyRequest(String identificationNumber, String email) {}
 
