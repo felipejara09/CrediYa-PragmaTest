@@ -1,5 +1,6 @@
 package co.com.bancolombia.api;
 
+import co.com.bancolombia.api.security.RequireAuth;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.RouterOperation;
@@ -31,9 +32,12 @@ public class RouterRest {
                     )
             )
     })
-    public RouterFunction<ServerResponse> routerFunction(Handler handler) {
+    public RouterFunction<ServerResponse> routerFunction(Handler handler, RequireAuth auth ) {
         return route(POST("/api/v1/usuarios"), handler::register)
-                .andRoute(GET("/api/v1/usuarios/verify"), handler::verify);
+                .filter(auth.requireRoles(1L,2L))
+                .andRoute(GET("/api/v1/usuarios/verify"), handler::verify)
+                .andRoute(POST("/api/v1/usuarios/with-password"), handler::registerWithPassword)
+                .andRoute(POST("/api/v1/login"), handler::login);
 
     }
 }

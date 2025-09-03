@@ -4,6 +4,7 @@ import co.com.bancolombia.model.user.User;
 import co.com.bancolombia.model.user.gateways.UserRepository;
 import co.com.bancolombia.r2dbc.entity.UserEntity;
 import co.com.bancolombia.r2dbc.helper.ReactiveAdapterOperations;
+import co.com.bancolombia.r2dbc.repository.UserReactiveRepository;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;

@@ -26,6 +26,7 @@ public class UserEntity {
     private LocalDate dateBorn;
     private String address;
     private String phoneNumber;
-    private Long idRol;
+    private Long idRole;
     private BigDecimal baseSalary;
+    private String password;
 }
