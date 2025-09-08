@@ -17,15 +17,20 @@ public class UserUseCase {
 
     public Mono<User> save(User user) {
         return Mono.defer(() -> {
-            validate(user);
+            String normalizedEmail = user.getEmail() == null ? null : user.getEmail().trim().toLowerCase();
+            User toSave = user.toBuilder().email(normalizedEmail).build();
 
-            return userRepository.findByEmail(user.getEmail())
+            validate(toSave);
+
+            return userRepository.findByEmail(toSave.getEmail())
                     .flatMap(existing -> Mono.<User>error(new DuplicateEmailException("Email address already in use.")))
-                    .switchIfEmpty(Mono.defer(() -> userRepository.save(user)));
+                    .switchIfEmpty(userRepository.save(toSave) );
         });
     }
 
-    public Mono<User>findByEmail(String email){return userRepository.findByEmail(email);}
+    public Mono<User> findByEmail(String email) {
+        return userRepository.findByEmail(email == null ? null : email.trim().toLowerCase());
+    }
 
     private void validate(User u) {
         final Pattern EMAIL_RX = Pattern.compile("^[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,63}$");
@@ -35,22 +40,25 @@ public class UserUseCase {
         required(u.getName(), "name");
         required(u.getLastName(), "lastName");
         required(u.getEmail(), "email");
-        required(u.getIdentityNumber(),"identityNumber");
-        if (u.getBaseSalary() == null) throw new RequiredFieldMissingException("baseSalary");
+        required(u.getIdentityNumber(), "identityNumber");
+
+
         if (!EMAIL_RX.matcher(u.getEmail()).matches()) {
             throw new InvalidEmailFormatException(u.getEmail());
         }
-        if (u.getBaseSalary().compareTo(MIN_SAL) < 0 || u.getBaseSalary().compareTo(MAX_SAL) > 0) {throw new InvalidBaseSalaryRangeException(u.getBaseSalary());
+        if (u.getBaseSalary() == null) {
+            throw new RequiredFieldMissingException("baseSalary");
         }
-
-
+        if (u.getBaseSalary().compareTo(MIN_SAL) < 0 || u.getBaseSalary().compareTo(MAX_SAL) > 0) {
+            throw new InvalidBaseSalaryRangeException(u.getBaseSalary());
+        }
     }
 
-    private void required(String value, String field) {if (value == null || value.trim().isEmpty()) throw new RequiredFieldMissingException(field);}
+    private void required(String value, String field) {
+        if (value == null || value.trim().isEmpty()) throw new RequiredFieldMissingException(field);
+    }
 
     public Mono<User> findByIdentityAndEmail(String identityNumber, String email) {
-        return userRepository.findByIdentityAndEmail(identityNumber, email);
+        return userRepository.findByIdentityAndEmail(identityNumber, email == null ? null : email.trim().toLowerCase());
     }
-
-
 }

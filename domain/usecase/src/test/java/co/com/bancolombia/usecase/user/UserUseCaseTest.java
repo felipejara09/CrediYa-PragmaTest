@@ -39,7 +39,7 @@ public class UserUseCaseTest {
                 .dateBorn(LocalDate.of(1990,1,1))
                 .address("CL 1 # 2-3")
                 .phoneNumber("3000000000")
-                .idRol(1L)
+                .idRole(1L)
                 .baseSalary(new BigDecimal("1000000"))
                 .build();
     }

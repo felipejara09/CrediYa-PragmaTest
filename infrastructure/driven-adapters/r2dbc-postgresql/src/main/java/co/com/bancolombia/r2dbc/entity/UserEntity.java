@@ -20,12 +20,18 @@ public class UserEntity {
     @Column("id_user")
     private Long id;
     private String name;
+    @Column("last_name")
     private String lastName;
     private String email;
+    @Column("identity_number")
     private String identityNumber;
     private LocalDate dateBorn;
     private String address;
+    @Column("phone_number")
     private String phoneNumber;
-    private Long idRol;
+    @Column("id_role")
+    private Long idRole;
+    @Column("base_salary")
     private BigDecimal baseSalary;
+    private String password;
 }

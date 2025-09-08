@@ -2,6 +2,7 @@ package co.com.bancolombia.api.error;
 
 import co.com.bancolombia.api.Handler.BadRequestException;
 
+import co.com.bancolombia.usecase.auth.exception.InvalidCredentialsException;
 import co.com.bancolombia.usecase.user.exception.DuplicateEmailException;
 
 import co.com.bancolombia.usecase.user.exception.InvalidBaseSalaryRangeException;
@@ -55,11 +56,11 @@ public class GlobalErrorHandler {
         return Mono.just(ErrorBody.of("BAD_REQUEST", ex.getMessage(), List.of(), 400));
     }
 
-    /*@ExceptionHandler(DuplicateEmailException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public Mono<ErrorBody> onDuplicate(DuplicateEmailException ex) {
-        return Mono.just(ErrorBody.of("CONFLICT", "Email address already in use.", List.of(), 409));
-    }*/
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Mono<ErrorBody> onInvalidCreds(InvalidCredentialsException ex) {
+        return Mono.just(ErrorBody.of("UNAUTHORIZED", ex.getMessage(), List.of(), 401));
+    }
 
     @ExceptionHandler(BadSqlGrammarException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -68,6 +69,20 @@ public class GlobalErrorHandler {
         return Mono.just(ErrorBody.of("INTERNAL_ERROR",
                 "Internal error processing request.", List.of(), 500));
     }
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Mono<ErrorBody> onUnauthorized(UnauthorizedException ex) {
+        log.debug("401 - {}", ex.getMessage());
+        return Mono.just(ErrorBody.of("UNAUTHORIZED", ex.getMessage(), List.of(), 401));
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Mono<ErrorBody> onForbidden(ForbiddenException ex) {
+        log.debug("403 - {}", ex.getMessage());
+        return Mono.just(ErrorBody.of("FORBIDDEN", ex.getMessage(), List.of(), 403));
+    }
+
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public Mono<ResponseEntity<ErrorBody>> onDataIntegrity(DataIntegrityViolationException ex) {
