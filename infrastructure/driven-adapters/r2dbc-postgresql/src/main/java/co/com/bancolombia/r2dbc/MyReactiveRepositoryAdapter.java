@@ -3,10 +3,16 @@ package co.com.bancolombia.r2dbc;
 import co.com.bancolombia.model.user.User;
 import co.com.bancolombia.model.user.gateways.UserRepository;
 import co.com.bancolombia.r2dbc.entity.UserEntity;
+<<<<<<< HEAD
 import co.com.bancolombia.r2dbc.mapper.UserMapper;
 import co.com.bancolombia.r2dbc.repository.UserReactiveRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+=======
+import co.com.bancolombia.r2dbc.helper.ReactiveAdapterOperations;
+import co.com.bancolombia.r2dbc.repository.UserReactiveRepository;
+import org.reactivecommons.utils.ObjectMapper;
+>>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 

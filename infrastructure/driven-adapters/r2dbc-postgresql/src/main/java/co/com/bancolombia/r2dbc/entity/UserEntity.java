@@ -29,9 +29,13 @@ public class UserEntity {
     private String address;
     @Column("phone_number")
     private String phoneNumber;
+<<<<<<< HEAD
     @Column("id_role")
     private Long idRole;
     @Column("base_salary")
+=======
+    private Long idRole;
+>>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
     private BigDecimal baseSalary;
     private String password;
 }

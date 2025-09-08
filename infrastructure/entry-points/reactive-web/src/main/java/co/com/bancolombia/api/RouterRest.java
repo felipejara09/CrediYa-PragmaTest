@@ -1,9 +1,13 @@
 package co.com.bancolombia.api;
 
+<<<<<<< HEAD
 import co.com.bancolombia.api.dto.CreateUserDTO;
 import co.com.bancolombia.api.security.RequireAuth;
 import co.com.bancolombia.api.dto.LoginDTO;
 import co.com.bancolombia.api.dto.TokenDTO;
+=======
+import co.com.bancolombia.api.security.RequireAuth;
+>>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +31,29 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 @Configuration
 @Tag(name = "Usuarios", description = "Registro y consulta de usuarios")
 public class RouterRest {
+<<<<<<< HEAD
+=======
+    @Bean
+    @RouterOperations({
+            @RouterOperation(
+                    path = "/api/v1/usuarios",
+                    operation = @Operation(
+                            summary = "Registrar usuario",
+                            description = "Crea un nuevo usuario",
+                            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                    required = true
+                            ),
+                            tags = {"Usuarios"}
+                    )
+            )
+    })
+    public RouterFunction<ServerResponse> routerFunction(Handler handler, RequireAuth auth ) {
+        return route(POST("/api/v1/usuarios"), handler::register)
+                .filter(auth.requireRoles(1L,2L))
+                .andRoute(GET("/api/v1/usuarios/verify"), handler::verify)
+                .andRoute(POST("/api/v1/usuarios/with-password"), handler::registerWithPassword)
+                .andRoute(POST("/api/v1/login"), handler::login);
+>>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
 
     @Bean
     public RouterFunction<ServerResponse> routerFunction(Handler handler, RequireAuth auth) {

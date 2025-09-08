@@ -29,8 +29,12 @@ spring:
       locations: classpath:db/migration
   logging:
     level:
+<<<<<<< HEAD
       co.com.bancolombia: INFO
       org.springframework.web: INFO
+=======
+      co.com.bancolombia: "INFO"
+>>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
 management:
   endpoints:
     web:
@@ -45,6 +49,7 @@ cors:
 jwt:
   secret: "this-is-a-very-long-32-byte-secret-key!!"
   expires-in-seconds: 3600
+<<<<<<< HEAD
 springdoc:
   api-docs:
     enabled: true
@@ -56,3 +61,5 @@ springdoc:
 
 
 
+=======
+>>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
