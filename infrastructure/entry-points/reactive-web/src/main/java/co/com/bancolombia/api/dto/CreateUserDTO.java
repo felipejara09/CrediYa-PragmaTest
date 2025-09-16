@@ -14,15 +14,6 @@ public record CreateUserDTO (
         LocalDate dateBorn,
         String address,
         Long idRole,
-<<<<<<< HEAD
         BigDecimal baseSalary,
         String password) {
-=======
-<<<<<<< HEAD
-        BigDecimal baseSalary,
-        String password) {
-=======
-        BigDecimal baseSalary) {
->>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
->>>>>>> 64ae74362c4ef6e5c96ad00eb9499a158b0963b0
 }

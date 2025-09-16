@@ -11,11 +11,7 @@ public record CreateUserWithPasswordDTO(
         String phoneNumber,
         LocalDate dateBorn,
         String address,
-<<<<<<< HEAD
         Long idRole,
-=======
-        Long idRol,
->>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
         BigDecimal baseSalary,
         String password
 ) {

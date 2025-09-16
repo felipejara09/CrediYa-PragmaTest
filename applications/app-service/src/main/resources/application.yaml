@@ -22,7 +22,6 @@ spring:
       user: ${DB_USER:postgres}
       password: ${DB_PASSWORD:postgrespws}
       locations: classpath:db/migration
-<<<<<<< HEAD
 
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:8080}
@@ -30,30 +29,12 @@ cors:
 jwt:
   secret: ${JWT_SECRET:this-is-a-very-long-32-byte-secret-key!!}
   expires-in-seconds: ${JWT_EXPIRES_IN:3600}
-=======
-  logging:
-    level:
-<<<<<<< HEAD
-      co.com.bancolombia: INFO
-      org.springframework.web: INFO
-=======
-      co.com.bancolombia: "INFO"
->>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health,prometheus"
-  endpoint:
-    health:
-      probes:
-        enabled: true
-cors:
-  allowed-origins: "http://localhost:4200,http://localhost:8080"
-jwt:
-  secret: "this-is-a-very-long-32-byte-secret-key!!"
-  expires-in-seconds: 3600
-<<<<<<< HEAD
+
+logging:
+  level:
+    co.com.bancolombia: INFO
+    org.springframework.web: INFO
+
 springdoc:
   api-docs:
     enabled: true
@@ -64,7 +45,3 @@ springdoc:
 
 
 
-
-=======
->>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
->>>>>>> 64ae74362c4ef6e5c96ad00eb9499a158b0963b0
