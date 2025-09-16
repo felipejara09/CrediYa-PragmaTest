@@ -1,11 +1,9 @@
 package co.com.bancolombia.api.dto;
 
-import jakarta.validation.constraints.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record CreateUserDTO (
+public record CreateUserWithPasswordDTO(
         String name,
         String lastName,
         String email,
@@ -13,16 +11,12 @@ public record CreateUserDTO (
         String phoneNumber,
         LocalDate dateBorn,
         String address,
+<<<<<<< HEAD
         Long idRole,
-<<<<<<< HEAD
-        BigDecimal baseSalary,
-        String password) {
 =======
-<<<<<<< HEAD
-        BigDecimal baseSalary,
-        String password) {
-=======
-        BigDecimal baseSalary) {
+        Long idRol,
 >>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
->>>>>>> 64ae74362c4ef6e5c96ad00eb9499a158b0963b0
+        BigDecimal baseSalary,
+        String password
+) {
 }

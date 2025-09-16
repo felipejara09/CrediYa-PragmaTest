@@ -24,7 +24,11 @@ public class UserUseCase {
 
             return userRepository.findByEmail(toSave.getEmail())
                     .flatMap(existing -> Mono.<User>error(new DuplicateEmailException("Email address already in use.")))
+<<<<<<< HEAD
                     .switchIfEmpty(Mono.defer(() -> userRepository.save(toSave)));
+=======
+                    .switchIfEmpty(userRepository.save(toSave) );
+>>>>>>> 64ae74362c4ef6e5c96ad00eb9499a158b0963b0
         });
     }
 

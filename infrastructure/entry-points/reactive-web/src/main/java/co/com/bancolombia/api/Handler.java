@@ -1,11 +1,24 @@
 package co.com.bancolombia.api;
 
 import co.com.bancolombia.api.dto.CreateUserDTO;
+<<<<<<< HEAD
 import co.com.bancolombia.api.dto.LoginDTO;
 import co.com.bancolombia.api.dto.TokenDTO;
 import co.com.bancolombia.api.mapper.UserDTOMapper;
 import co.com.bancolombia.model.auth.gateways.PasswordEncoder;
 import co.com.bancolombia.usecase.auth.AuthUseCause;
+=======
+import co.com.bancolombia.api.dto.CreateUserWithPasswordDTO;
+import co.com.bancolombia.api.dto.LoginDTO;
+import co.com.bancolombia.api.dto.TokenDTO;
+import co.com.bancolombia.api.mapper.UserDTOMapper;
+<<<<<<< HEAD
+import co.com.bancolombia.model.auth.gateways.PasswordEncoder;
+=======
+>>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
+import co.com.bancolombia.usecase.auth.AuthUseCause;
+import co.com.bancolombia.usecase.user.RegisterWithPasswordUseCase;
+>>>>>>> 64ae74362c4ef6e5c96ad00eb9499a158b0963b0
 import co.com.bancolombia.usecase.user.UserUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,11 +44,23 @@ public class Handler {
     private final UserUseCase userUseCase;
     private final UserDTOMapper mapper;
     private final AuthUseCause authUseCase;
+<<<<<<< HEAD
     private final PasswordEncoder passwordEncoder;
+=======
+<<<<<<< HEAD
+    private final PasswordEncoder passwordEncoder;
+=======
+>>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
+    private final RegisterWithPasswordUseCase registerWithPasswordUseCase;
+>>>>>>> 64ae74362c4ef6e5c96ad00eb9499a158b0963b0
 
 
 
     @Transactional
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 64ae74362c4ef6e5c96ad00eb9499a158b0963b0
     public Mono<ServerResponse> register(ServerRequest req) {
         return req.bodyToMono(CreateUserDTO.class)
                 .doOnNext(d -> log.info("[register] request email={} idRole={}", d.email(), d.idRole()))
@@ -49,6 +74,15 @@ public class Handler {
                     }
                     return user;
                 })
+<<<<<<< HEAD
+=======
+=======
+    public Mono<ServerResponse> register(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(CreateUserDTO.class)
+                .doOnNext(d -> log.info("[register] request email={} idRole={}", d.email(), d.idRole()))
+                .map(mapper::toDomain)
+>>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
+>>>>>>> 64ae74362c4ef6e5c96ad00eb9499a158b0963b0
                 .flatMap(userUseCase::save)
                 .doOnNext(u -> log.info("[register] saved id={} email={}", u.getId(), u.getEmail()))
                 .map(mapper::toResponse)
@@ -96,10 +130,59 @@ public class Handler {
                 .flatMap(dto -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(dto));
+<<<<<<< HEAD
     }
 
 
 
+=======
+    }
+
+    public Mono<ServerResponse> registerWithPassword(ServerRequest req) {
+        return req.bodyToMono(CreateUserWithPasswordDTO.class)
+                .flatMap(dto -> {
+                    var user = co.com.bancolombia.model.user.User.builder()
+                            .name(dto.name()).lastName(dto.lastName()).email(dto.email())
+                            .identityNumber(dto.identityNumber()).phoneNumber(dto.phoneNumber())
+                            .dateBorn(dto.dateBorn()).address(dto.address())
+                            .idRole(dto.idRole()).baseSalary(dto.baseSalary()).build();
+                    return registerWithPasswordUseCase.register(user, dto.password());
+                })
+                .map(mapper::toResponse)
+                .flatMap(resp -> ServerResponse.created(URI.create("/api/v1/usuarios/" + resp.id()))
+                        .contentType(MediaType.APPLICATION_JSON).bodyValue(resp));
+    }
+
+    public Mono<ServerResponse> login(ServerRequest request) {
+        return request.bodyToMono(LoginDTO.class)
+                .doOnNext(dto -> log.info("login.attempt email={}", dto.email()))
+                .flatMap(dto -> authUseCase.login(dto.email(), dto.password()))
+                .doOnSuccess(tr -> log.info("login.success"))
+                .doOnError(e -> log.warn("login.failed {}", e.toString()))
+                .map(tr -> new TokenDTO(tr.tokenType(), tr.accessToken(), tr.expiresIn()))
+                .flatMap(dto -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(dto));
+    }
+
+<<<<<<< HEAD
+=======
+    public Mono<ServerResponse> registerWithPassword(ServerRequest req) {
+        return req.bodyToMono(CreateUserWithPasswordDTO.class)
+                .flatMap(dto -> {
+                    var user = co.com.bancolombia.model.user.User.builder()
+                            .name(dto.name()).lastName(dto.lastName()).email(dto.email())
+                            .identityNumber(dto.identityNumber()).phoneNumber(dto.phoneNumber())
+                            .dateBorn(dto.dateBorn()).address(dto.address())
+                            .idRole(dto.idRol()).baseSalary(dto.baseSalary()).build();
+                    return registerWithPasswordUseCase.register(user, dto.password());
+                })
+                .map(mapper::toResponse)
+                .flatMap(resp -> ServerResponse.created(URI.create("/api/v1/usuarios/" + resp.id()))
+                        .contentType(MediaType.APPLICATION_JSON).bodyValue(resp));
+    }
+
+
+>>>>>>> e9327b0a8449ea6154e02b3317113961689f247a
+>>>>>>> 64ae74362c4ef6e5c96ad00eb9499a158b0963b0
 
 
     public static final class BadRequestException extends RuntimeException {
