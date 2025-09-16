@@ -39,30 +39,31 @@ public class UserUseCaseTest {
                 .dateBorn(LocalDate.of(1990,1,1))
                 .address("CL 1 # 2-3")
                 .phoneNumber("3000000000")
-                .idRol(1L)
+                .idRole(1L)
                 .baseSalary(new BigDecimal("1000000"))
                 .build();
     }
 
     @Test
-    void save_ok_whenValidAndUniqueEmail() {
-        User u = validUser();
-        when(repo.findByEmail(eq(u.getEmail()))).thenReturn(Mono.empty());
-        when(repo.save(any(User.class))).thenReturn(Mono.just(u));
+    void shouldSaveUserWhenValidAndUniqueEmail() {
+        User u = validUser().toBuilder().email("  JOHN.DOE@test.com ").build();
+
+        when(repo.findByEmail("john.doe@test.com")).thenReturn(Mono.empty());
+        when(repo.save(any(User.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         StepVerifier.create(useCase.save(u))
-                .expectNext(u)
+                .expectNextMatches(saved -> "john.doe@test.com".equals(saved.getEmail()))
                 .verifyComplete();
 
-        verify(repo).findByEmail(u.getEmail());
-        verify(repo).save(u);
+        verify(repo).findByEmail("john.doe@test.com");
+        verify(repo).save(argThat(s -> "john.doe@test.com".equals(s.getEmail())));
     }
 
     @Test
-    void save_fails_whenDuplicateEmail() {
+    void shouldFailWhenEmailAlreadyExists() {
         User u = validUser();
-
-        when(repo.findByEmail(eq(u.getEmail()))).thenReturn(Mono.just(u));
+        when(repo.findByEmail(u.getEmail())).thenReturn(Mono.just(u));
+        // con Mono.defer en producción ya no hace falta stubbear save
 
         StepVerifier.create(useCase.save(u))
                 .expectError(DuplicateEmailException.class)
@@ -73,8 +74,8 @@ public class UserUseCaseTest {
     }
 
     @Test
-    void save_fails_whenEmailFormatInvalid() {
-        User u = validUser().toBuilder().email("mal-formato").build();
+    void shouldFailWhenEmailHasInvalidFormat() {
+        User u = validUser().toBuilder().email("invalid-format").build();
 
         StepVerifier.create(useCase.save(u))
                 .expectError(InvalidEmailFormatException.class)
@@ -85,7 +86,7 @@ public class UserUseCaseTest {
     }
 
     @Test
-    void save_fails_whenBaseSalaryOutOfRange() {
+    void shouldFailWhenBaseSalaryIsOutOfRange() {
         User u = validUser().toBuilder().baseSalary(new BigDecimal("20000000")).build();
 
         StepVerifier.create(useCase.save(u))
@@ -97,7 +98,7 @@ public class UserUseCaseTest {
     }
 
     @Test
-    void save_fails_whenRequiredBlank() {
+    void shouldFailWhenRequiredFieldIsBlank() {
         User u = validUser().toBuilder().name("  ").build();
 
         StepVerifier.create(useCase.save(u))
@@ -107,5 +108,81 @@ public class UserUseCaseTest {
         verify(repo, never()).findByEmail(any());
         verify(repo, never()).save(any());
     }
+
+    @Test
+    void shouldFailWhenLastNameIsBlank() {
+        User u = validUser().toBuilder().lastName("  ").build();
+
+        StepVerifier.create(useCase.save(u))
+                .expectError(RequiredFieldMissingException.class)
+                .verify();
+
+        verify(repo, never()).findByEmail(any());
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    void shouldFailWhenIdentityNumberIsBlank() {
+        User u = validUser().toBuilder().identityNumber(" ").build();
+
+        StepVerifier.create(useCase.save(u))
+                .expectError(RequiredFieldMissingException.class)
+                .verify();
+
+        verify(repo, never()).findByEmail(any());
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    void shouldNormalizeEmailOnFindByEmailParameter() {
+        User stored = validUser(); // el repo retorna lo que tenga
+        when(repo.findByEmail("john.doe@test.com")).thenReturn(Mono.just(stored));
+
+        StepVerifier.create(useCase.findByEmail("  JOHN.DOE@test.com "))
+                .expectNext(stored)
+                .verifyComplete();
+
+        verify(repo).findByEmail("john.doe@test.com");
+    }
+
+    @Test
+    void shouldFindByIdentityAndEmailWithNormalizedEmail() {
+        User stored = validUser();
+        when(repo.findByIdentityAndEmail("123", "john.doe@test.com"))
+                .thenReturn(Mono.just(stored));
+
+        StepVerifier.create(useCase.findByIdentityAndEmail("123", "  JOHN.DOE@test.com "))
+                .expectNext(stored)
+                .verifyComplete();
+
+        verify(repo).findByIdentityAndEmail("123", "john.doe@test.com");
+    }
+
+    @Test
+    void shouldPassWithSalaryOnBounds() {
+        when(repo.findByEmail(anyString())).thenReturn(Mono.empty());
+        when(repo.save(any(User.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+
+        StepVerifier.create(useCase.save(validUser().toBuilder().baseSalary(new BigDecimal("0")).build()))
+                .expectNextCount(1)
+                .verifyComplete();
+
+        StepVerifier.create(useCase.save(validUser().toBuilder().baseSalary(new BigDecimal("15000000")).build()))
+                .expectNextCount(1)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldFailWhenBaseSalaryIsNull() {
+        User u = validUser().toBuilder().baseSalary(null).build();
+
+        StepVerifier.create(useCase.save(u))
+                .expectError(RequiredFieldMissingException.class)
+                .verify();
+
+        verify(repo, never()).findByEmail(any());
+        verify(repo, never()).save(any());
+    }
+
 
 }
